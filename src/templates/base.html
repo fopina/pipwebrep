@@ -33,6 +33,7 @@
 			        <li class="active"><a href="{{ url_for('index') }}">SQL</a></li>
 			      </ul>
 			      <ul class="nav navbar-nav navbar-right">
+			      	<li class="navbar-text">Signed in as {{ session['profile'].dbuser }}</li>
 			        <li><a href="{{ url_for('logout') }}">Logout</a></li>
 			      </ul>
 			    </div><!-- /.navbar-collapse -->
@@ -40,11 +41,14 @@
 			</nav>
 			{% endblock %}
 			{% block messages %}
-			{% if message %}
-			<div class="row text-center">
-				{{ message }}
-			</div>
-			{% endif %}
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% for category, message in messages %}
+			<div class="alert alert-{{ category }} fade in text-center" style="margin-top:10px;">
+      			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      			{{ message }}
+    		</div>
+				{% endfor %}
+			{% endwith %}
 			{% endblock %}
 			{% block content %}{% endblock %}
 		</div>

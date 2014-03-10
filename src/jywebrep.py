@@ -1,10 +1,12 @@
-from flask import Flask, session, redirect, url_for, escape, request, render_template
+from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
 from functools import wraps
 from PIPStuff import PIPStuff
 import settings
 
 import java.lang.Class
 java.lang.Class.forName(settings.DRIVER)
+
+FLASH_ERROR = 'danger'
 
 app = Flask(__name__)
 
@@ -29,20 +31,22 @@ def requires_login():
 @app.route('/')
 @requires_login()
 def index():
-	return render_template('main.html', name = 'asd')
+	return render_template('main.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
 		profile = PIPStuff(settings.URL, request.form['username'], request.form['password'])
 		try:
-			connection = profile.connect()
+			profile.connect()
+			session['profile'] = profile
+		except java.sql.SQLException, sqle:
+			flash(sqle.message, FLASH_ERROR)
 		except:
-			print 'invalid login'
-			return redirect(url_for('login'))
-		
-		session['profile'] = profile
+			flash('Login Failed', FLASH_ERROR)
+
 		return redirect(url_for('index'))
+
 	return render_template('login.html')
 
 @app.route('/logout')
@@ -63,11 +67,14 @@ def query():
 
 	try:
 		headers, results = profile.executeSQL(stmt)
+		return render_template('query.html', query = stmt, headers = headers, results = results)
+	except java.sql.SQLException, sqle:
+		flash(sqle.message, FLASH_ERROR)
 	except:
-		print 'error with query'
-		return redirect(url_for('query'))
+		flash('Login Failed', FLASH_ERROR)
 
-	return render_template('query.html', query = stmt, headers = headers, results = results)
+	return redirect(url_for('query'))
+	
 
 @app.errorhandler(500)
 def internal_error(error):

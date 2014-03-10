@@ -8,11 +8,11 @@ from java.sql import DriverManager,Statement,ResultSet,ResultSetMetaData
 class PIPStuff():
 	def __init__(self, dburl, dbuser, dbpass):
 		self._dburl = dburl
-		self._dbuser = dbuser
+		self.dbuser = dbuser
 		self._dbpass = dbpass
 	
 	def connect(self):
-		return DriverManager.getConnection(self._dburl,self._dbuser,self._dbpass)
+		return DriverManager.getConnection(self._dburl,self.dbuser,self._dbpass)
 
 	def executeSQL(self, sqlQry):
 		connection = self.connect()

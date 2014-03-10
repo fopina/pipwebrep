@@ -51,7 +51,7 @@ def login():
 
 @app.route('/logout')
 def logout():
-	session.pop('profile', None)
+	session.clear()
 	return redirect(url_for('index'))
 
 @app.route('/query', methods=['GET', 'POST'])

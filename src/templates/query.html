@@ -15,10 +15,11 @@
 				<th>{{ header }}</th>
 				{% endfor %}
 			</tr>
-			{% for result in results %}
+			{% for row in results %}
 			<tr>
-				<td>{{ result.0 }}</td>
-				<td>{{ result.1 }}</td>
+				{% for col in row %}
+				<td>{{ col }}</td>
+				{% endfor %}
 			</tr>
 			{% endfor %}
 		</table>

@@ -22,12 +22,12 @@ class PIPStuff():
 
 		headers, rows = ([],[])
 
-		for i in xrange(1, rsmd.getColumnCount()):
+		for i in xrange(1, rsmd.getColumnCount()+1):
 			headers.append(rsmd.getColumnLabel(i))
 
 		while rs.next():
 			cols = []
-			for i in xrange(1, rsmd.getColumnCount()):
+			for i in xrange(1, rsmd.getColumnCount()+1):
 				cols.append(rs.getString(i))
 			rows.append(cols)
 

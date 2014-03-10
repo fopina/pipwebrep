@@ -1,0 +1,9 @@
+# JDBC driver class - in case it changes in the future
+DRIVER = 'sanchez.jdbc.driver.ScDriver'
+
+# MTM IP and port configuration
+HOST = '192.168.207.160'
+PORT = '18166'
+
+# JDBC URL
+URL = 'protocol=jdbc:sanchez/database=' + HOST + ':' + PORT + ':SCA$IBS'

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+
+cd `dirname $0`
+. conf
+cd ..
+
+(cd src && jar cvf "../dist/$WAR" .) > /dev/null
+
+if [ "$?" == "0" ]; then
+	echo
+	echo Packing was successful
+	ls -la "dist/$WAR"
+else
+	echo
+	echo "ERROR"
+fi

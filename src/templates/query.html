@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block content %}
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-body">
+			<p>Results for query:</p>
+			<p><i>{{ query }}</i></p>
+		</div>
+
+		<!-- Table -->
+		<table class="table">
+			<tr>
+				{% for header in headers %}
+				<th>{{ header }}</th>
+				{% endfor %}
+			</tr>
+			{% for result in results %}
+			<tr>
+				<td>{{ result.0 }}</td>
+				<td>{{ result.1 }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% endblock %}

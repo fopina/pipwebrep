@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}SQL{% endblock %}
+{% block content %}
+	<div class="row">
+		<div class="col-md-4 col-md-offset-4">
+			<form method="POST" action="query" accept-charset="UTF-8" role="form" id="loginform" class="form-signin">
+				<fieldset>
+			  		<h2>SQL Query</h2>
+
+			  		<hr class="colorgraph">
+
+				    <textarea class="form-control" placeholder="query" name="query"></textarea>
+
+				    <hr class="colorgraph">
+
+				    <input class="btn btn-lg btn-block" type="submit" value="Submit">
+			  	</fieldset>
+			</form>
+		</div>
+	</div>
+{% endblock %}

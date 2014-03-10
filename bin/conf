@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# WAR filename
+export WAR="jyWebRep.war"
+# Application name - tomcat path
+export NAME="jyWebRep"
+# Tomcat base URL - including manager basic atuh
+export TOMCAT="http://tomcat:tomcat@192.168.207.160:8080/"

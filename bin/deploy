@@ -1,0 +1,15 @@
+#!/bin/bash
+
+cd `dirname $0`
+
+. conf
+
+curl -k --upload-file "../dist/${WAR}" "$TOMCAT/manager/deploy?path=/${NAME}&update=true"
+
+if [ "$?" == "0" ]; then
+	echo
+	echo Upload was successful
+else
+	echo
+	echo "ERROR"
+fi

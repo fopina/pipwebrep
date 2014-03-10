@@ -65,6 +65,8 @@ def query():
 	profile = session['profile']
 	stmt = request.form['query']
 
+	session['query'] = stmt
+
 	try:
 		headers, results = profile.executeSQL(stmt)
 		return render_template('query.html', query = stmt, headers = headers, results = results)

@@ -5,6 +5,8 @@ cd `dirname $0`
 . conf
 cd ..
 
+[ -d dist ] || mkdir dist
+
 (cd src && jar cvf "../dist/$WAR" .) > /dev/null
 
 if [ "$?" == "0" ]; then

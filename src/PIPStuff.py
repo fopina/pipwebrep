@@ -14,13 +14,17 @@ class PIPUser():
 	def connect(self):
 		return DriverManager.getConnection(self._dburl,self.username,self.password)
 
-	def executeQuery(self, sqlQry, maxrows = None):
+	def executeQuery(self, sqlQry, maxrows = None, values = []):
 		connection = self.connect()
-		statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
+
+		statement = connection.prepareStatement(sqlQry, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
+
+		self._updateStatement(statement, values)
+
 		if maxrows:
 			statement.setMaxRows(maxrows)
 			statement.setFetchSize(maxrows)
-		rs = statement.executeQuery(sqlQry)
+		rs = statement.executeQuery()
 		rsmd = rs.getMetaData()
 
 		headers, rows = ([],[])
@@ -36,15 +40,23 @@ class PIPUser():
 
 		return (headers,rows)
 
-	def executeUpdate(self, sql):
+	def executeUpdate(self, sql, values = []):
 		connection = self.connect()
 
-		statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
+		statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
 
-		rows = statement.executeUpdate(sql)
+		self._updateStatement(statement, values)
+
+		rows = statement.executeUpdate()
 
 		return rows
 
+	def _updateStatement(self, statement, values):
+		if not values:
+			return
 
-
-	
+		for i in xrange(len(values)):
+			if values[i] == None:
+				statement.setString(i+1, '')
+			else:
+				statement.setString(i+1, values[i])		

@@ -48,9 +48,10 @@ def reports():
 
 	try:
 		_, reports = profile.executeQuery(
-			"SELECT QID,DES,SCOPE,USR FROM WEBSQLQRY WHERE SCOPE='%s' or (SCOPE='%s' and USR='%s')"
-			% (settings.SCOPE_PUBLIC, settings.SCOPE_PRIVATE, profile.username),
-			 100)
+			"SELECT QID,DES,SCOPE,USR FROM WEBSQLQRY WHERE SCOPE=? or (SCOPE=? and USR=?)",
+			 100,
+			 [settings.SCOPE_PUBLIC, settings.SCOPE_PRIVATE, profile.username]
+			 )
 	except java.sql.SQLException, sqle:
 		flash(sqle.message, FLASH_ERROR)
 	
@@ -95,10 +96,11 @@ def query():
 	else:
 		if 'run' in request.args:
 			_, queries = profile.executeQuery(
-			"SELECT QUERY FROM WEBSQLQRY WHERE QID='%s'"
-			% (request.args['run']),
-			 1)
-			
+				"SELECT QUERY FROM WEBSQLQRY WHERE QID=?",
+				1,
+				[request.args['run']]
+				)
+
 			if not queries or not queries[0][0]:
 				flash('Report %s not found' % request.args['run'], FLASH_ERROR)
 				return redirect(url_for('reports'))

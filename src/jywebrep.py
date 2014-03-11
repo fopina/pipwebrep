@@ -90,9 +90,14 @@ def logout():
 def query():
 	query = None
 	profile = session['profile']
+	maxrows = settings.DEFAULT_MAXROWS
 
 	if request.method == 'POST':
 		query = request.form.get('query')
+		try:
+			maxrows = int(request.form['maxrows'])
+		except:
+			pass
 	else:
 		if 'run' in request.args:
 			_, queries = profile.executeQuery(
@@ -106,14 +111,13 @@ def query():
 				return redirect(url_for('reports'))
 
 			query = queries[0][0]
+			try:
+				maxrows = int(request.args['maxrows'])
+			except:
+				pass
 
 	if not query:
 		return redirect(url_for('sqleditor'))
-	
-	try:
-		maxrows = int(request.form['maxrows'])
-	except:
-		maxrows = 100
 
 	session['query'] = query
 	session['maxrows'] = maxrows

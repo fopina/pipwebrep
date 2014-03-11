@@ -27,12 +27,15 @@
 			{% endfor %}
 		</table>
 	</div>
+	<p class="pull-right">
+		Max Rows: <input type="text" name="maxrows" id="maxrows" value="{{ session['maxrows'] }}" />
+	</p>
 {% endblock %}
 
 {% block scripts %}
 	<script>
 	$(".clickableRow").click(function() {
-        window.document.location = $(this).data('url');
+        window.document.location = $(this).data('url') + '&maxrows=' + $("#maxrows").val();
     });
 	</script>
 {% endblock %}

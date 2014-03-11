@@ -11,3 +11,5 @@ URL = 'protocol=jdbc:sanchez/database=' + HOST + ':' + PORT + ':SCA$IBS'
 # SCOPE values for WEBSQLQRY
 SCOPE_PRIVATE = 'Private'
 SCOPE_PUBLIC = 'Public'
+
+DEFAULT_MAXROWS = 100

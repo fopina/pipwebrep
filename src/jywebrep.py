@@ -1,6 +1,6 @@
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
 from functools import wraps
-from PIPStuff import PIPStuff
+from PIPStuff import PIPUser
 import settings
 
 import java.lang.Class
@@ -43,7 +43,7 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
-		profile = PIPStuff(settings.URL, request.form['username'], request.form['password'])
+		profile = PIPUser(settings.URL, request.form['username'], request.form['password'])
 		try:
 			profile.connect()
 			session['profile'] = profile

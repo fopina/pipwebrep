@@ -5,14 +5,14 @@ from java.sql import DriverManager,Statement,ResultSet,ResultSetMetaData
 # import java.lang.Class
 # java.lang.Class.forName(DRIVER_NAME)
 
-class PIPStuff():
+class PIPUser():
 	def __init__(self, dburl, dbuser, dbpass):
 		self._dburl = dburl
-		self.dbuser = dbuser
-		self._dbpass = dbpass
+		self.username = dbuser
+		self.password = dbpass
 	
 	def connect(self):
-		return DriverManager.getConnection(self._dburl,self.dbuser,self._dbpass)
+		return DriverManager.getConnection(self._dburl,self.username,self.password)
 
 	def executeSQL(self, sqlQry, maxrows = None):
 		connection = self.connect()

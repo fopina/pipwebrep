@@ -14,9 +14,12 @@ class PIPStuff():
 	def connect(self):
 		return DriverManager.getConnection(self._dburl,self.dbuser,self._dbpass)
 
-	def executeSQL(self, sqlQry):
+	def executeSQL(self, sqlQry, maxrows = None):
 		connection = self.connect()
 		statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
+		if maxrows:
+			statement.setMaxRows(maxrows)
+			statement.setFetchSize(maxrows)
 		rs = statement.executeQuery(sqlQry)
 		rsmd = rs.getMetaData()
 

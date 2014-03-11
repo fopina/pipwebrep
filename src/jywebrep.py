@@ -18,6 +18,13 @@ app = Flask(__name__)
 import sys,os
 app.root_path = os.path.abspath(os.path.dirname(sys.modules['flask'].__file__)+'/../../../')
 
+@app.template_filter('pluralize')
+def pluralize(number, singular = '', plural = 's'):
+    if number == 1:
+    	return singular
+    else:
+    	return plural
+
 def requires_login():
 	def wrapper(f):
 		@wraps(f)
@@ -64,16 +71,22 @@ def query():
 
 	profile = session['profile']
 	stmt = request.form['query']
+	try:
+		maxrows = int(request.form['maxrows'])
+	except:
+		maxrows = 100
 
 	session['query'] = stmt
+	session['maxrows'] = maxrows
 
 	try:
-		headers, results = profile.executeSQL(stmt)
+		headers, results = profile.executeSQL(stmt, maxrows)
 		return render_template('query.html', query = stmt, headers = headers, results = results)
 	except java.sql.SQLException, sqle:
 		flash(sqle.message, FLASH_ERROR)
 	except:
-		flash('Login Failed', FLASH_ERROR)
+		flash('Query Failed', FLASH_ERROR)
+		raise
 
 	return redirect(url_for('query'))
 	

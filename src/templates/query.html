@@ -4,7 +4,7 @@
 	<div class="panel panel-default">
 		<!-- Default panel contents -->
 		<div class="panel-body">
-			<p>Results for query:</p>
+			<p><strong>{{ results|count }}</strong> result{{ results|count|pluralize }} for query (maximum {{ session['maxrows'] }}):</p>
 			<p><i>{{ query }}</i></p>
 		</div>
 

@@ -14,7 +14,7 @@ class PIPUser():
 	def connect(self):
 		return DriverManager.getConnection(self._dburl,self.username,self.password)
 
-	def executeSQL(self, sqlQry, maxrows = None):
+	def executeQuery(self, sqlQry, maxrows = None):
 		connection = self.connect()
 		statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
 		if maxrows:
@@ -35,3 +35,16 @@ class PIPUser():
 			rows.append(cols)
 
 		return (headers,rows)
+
+	def executeUpdate(self, sql):
+		connection = self.connect()
+
+		statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
+
+		rows = statement.executeUpdate(sql)
+
+		return rows
+
+
+
+	

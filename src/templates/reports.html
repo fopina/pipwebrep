@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+	<div class="panel panel-default">
+		<!-- Table -->
+		<table class="table table-hover">
+			<tr>
+				<th>ID</th>
+				<th>Description</th>
+				<th>Scope</th>
+				<th>Owner</th>
+				<th></th>
+				<th></th>
+			</tr>
+			{% for row in reports %}
+			<tr class='clickableRow' data-url="{{ url_for('query', run=row.0) }}">
+				{% for col in row %}
+				<td>{{ col }}</td>
+				{% endfor %}
+				<td>
+					<span class="glyphicon glyphicon-pencil"></span>
+				</td>
+				<td>
+					<span class="glyphicon glyphicon-remove"></span>
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+{% endblock %}
+
+{% block scripts %}
+	<script>
+	$(".clickableRow").click(function() {
+        window.document.location = $(this).data('url');
+    });
+	</script>
+{% endblock %}

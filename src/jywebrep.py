@@ -36,9 +36,32 @@ def requires_login():
 	return wrapper
 
 @app.route('/')
-@requires_login()
 def index():
-	return render_template('main.html')
+	return redirect(url_for('reports'))
+
+@app.route('/reports')
+@requires_login()
+def reports():
+	session['tab'] = 1
+	profile = session['profile']
+	reports = []
+
+	try:
+		_, reports = profile.executeQuery(
+			"SELECT QID,DES,SCOPE,USR FROM WEBSQLQRY WHERE SCOPE='%s' or (SCOPE='%s' and USR='%s')"
+			% (settings.SCOPE_PUBLIC, settings.SCOPE_PRIVATE, profile.username),
+			 100)
+	except java.sql.SQLException, sqle:
+		flash(sqle.message, FLASH_ERROR)
+	
+	return render_template('reports.html', reports = reports)
+
+
+@app.route('/sqleditor')
+@requires_login()
+def sqleditor():
+	session['tab'] = 2
+	return render_template('sqleditor.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -64,24 +87,38 @@ def logout():
 @app.route('/query', methods=['GET', 'POST'])
 @requires_login()
 def query():
-	if request.method != 'POST':
-		return redirect(url_for('index'))
-	if 'query' not in request.form:
-		return redirect(url_for('index'))
-
+	query = None
 	profile = session['profile']
-	stmt = request.form['query']
+
+	if request.method == 'POST':
+		query = request.form.get('query')
+	else:
+		if 'run' in request.args:
+			_, queries = profile.executeQuery(
+			"SELECT QUERY FROM WEBSQLQRY WHERE QID='%s'"
+			% (request.args['run']),
+			 1)
+			
+			if not queries or not queries[0][0]:
+				flash('Report %s not found' % request.args['run'], FLASH_ERROR)
+				return redirect(url_for('reports'))
+
+			query = queries[0][0]
+
+	if not query:
+		return redirect(url_for('sqleditor'))
+	
 	try:
 		maxrows = int(request.form['maxrows'])
 	except:
 		maxrows = 100
 
-	session['query'] = stmt
+	session['query'] = query
 	session['maxrows'] = maxrows
 
 	try:
-		headers, results = profile.executeSQL(stmt, maxrows)
-		return render_template('query.html', query = stmt, headers = headers, results = results)
+		headers, results = profile.executeQuery(query, maxrows)
+		return render_template('query.html', query = query, headers = headers, results = results)
 	except java.sql.SQLException, sqle:
 		flash(sqle.message, FLASH_ERROR)
 	except:

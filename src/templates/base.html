@@ -38,10 +38,11 @@
 			    <!-- Collect the nav links, forms, and other content for toggling -->
 			    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			      <ul class="nav navbar-nav">
-			        <li class="active"><a href="{{ url_for('index') }}">SQL</a></li>
+			      	<li{% if session['tab'] == 1 %} class="active"{% endif %}><a href="{{ url_for('reports') }}">Reports</a></li>
+			        <li{% if session['tab'] == 2 %} class="active"{% endif %}><a href="{{ url_for('sqleditor') }}">SQL</a></li>
 			      </ul>
 			      <ul class="nav navbar-nav navbar-right">
-			      	<li class="navbar-text">Signed in as {{ session['profile'].dbuser }}</li>
+			      	<li class="navbar-text">Signed in as {{ session['profile'].username }}</li>
 			        <li><a href="{{ url_for('logout') }}">Logout</a></li>
 			      </ul>
 			    </div><!-- /.navbar-collapse -->

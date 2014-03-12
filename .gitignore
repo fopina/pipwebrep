@@ -5,3 +5,4 @@ dist
 jdbc_*
 *.ig.py
 settings.py
+jython.jar

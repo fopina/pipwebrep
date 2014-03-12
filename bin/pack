@@ -7,6 +7,12 @@ cd ..
 
 [ -d dist ] || mkdir dist
 
+if [ ! -e src/WEB-INF/lib/jython.jar ]; then
+	echo "jython.jar not found, downloading..."
+	echo
+	curl -o src/WEB-INF/lib/jython.jar -O "${JYTHONURL}" || exit 1
+fi
+
 (cd src && jar cvf "../dist/$WAR" .) > /dev/null
 
 if [ "$?" == "0" ]; then

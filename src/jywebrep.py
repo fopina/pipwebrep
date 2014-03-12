@@ -239,7 +239,7 @@ def not_found(error):
 	return repr(error)
 
 # set the secret key.  keep this really secret:
-app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?R1'
+app.secret_key = settings.SECRET_KEY
 
 
 if __name__ == '__main__':

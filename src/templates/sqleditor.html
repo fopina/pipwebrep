@@ -5,11 +5,11 @@
 		<div class="col-md-12">
 			<form method="POST" action="query" accept-charset="UTF-8" role="form" id="loginform" class="form-signin">
 				<fieldset>
-			  		<h2>SQL Query</h2>
+			  		<h4>SQL Query</h4>
 
 			  		<hr class="colorgraph">
 
-				    <textarea class="form-control" placeholder="query" name="query" id="query">{{ session['query'] }}</textarea>
+				    <textarea class="form-control" placeholder="query" name="query" id="query" rows=10>{{ session['query'] }}</textarea>
 				    <br/>
 				    <p class="pull-right">Max Rows: <input type="text" name="maxrows" value="{{ session['maxrows'] }}" /></p>
 				    <br/>

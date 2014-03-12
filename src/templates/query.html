@@ -7,9 +7,10 @@
 			<p><strong>{{ results|count }}</strong> result{{ results|count|pluralize }} for query (maximum {{ session['maxrows'] }}):</p>
 			<p><i>{{ query }}</i></p>
 		</div>
-
+	</div>
+	
 		<!-- Table -->
-		<table class="table">
+		<table class="table table-condensed table-bordered">
 			<tr>
 				{% for header in headers %}
 				<th>{{ header }}</th>
@@ -23,5 +24,5 @@
 			</tr>
 			{% endfor %}
 		</table>
-	</div>
+	
 {% endblock %}

@@ -7,8 +7,10 @@ import java.lang.Class
 java.lang.Class.forName(settings.DRIVER)
 
 FLASH_ERROR = 'danger'
+FLASH_SUCCESS = 'success'
 
 app = Flask(__name__)
+app.config.from_object('settings')
 
 # dirty fix for app root_path because module is loaded as "__builtin__" (in Tomcat)
 # as flask is in the app WEB-INF
@@ -58,11 +60,105 @@ def reports():
 	return render_template('reports.html', reports = reports)
 
 
-@app.route('/sqleditor')
+@app.route('/sqleditor', methods=['GET', 'POST'])
 @requires_login()
 def sqleditor():
 	session['tab'] = 2
-	return render_template('sqleditor.html')
+	profile = session['profile']
+
+	if request.method == 'POST': # save query
+		form = request.form
+
+		if not form.get('id'):
+			flash('Report ID is required!', FLASH_ERROR)
+			return render_template('sqleditor.html', form = form)
+
+		_, queries = profile.executeQuery(
+					"SELECT QID,SCOPE,USR FROM WEBSQLQRY WHERE QID=?",
+					1,
+					[form['id']]
+					)
+
+		scope = settings.SCOPE_PRIVATE if form.get('scope') else settings.SCOPE_PUBLIC
+
+		# report already exists
+		if queries:
+			report = queries[0]
+
+			if form.get('confirmsave') != 'confirm':
+				return render_template('sqleditor.html', form = form, confirm_required = True)
+
+			# this should be in a PIP DQ trigger for atomicity, but...
+			if (report[1] == settings.SCOPE_PRIVATE) and (report[2] != profile.username):
+				flash('%s is private and not yours' % report[1], FLASH_ERROR)
+				return render_template('sqleditor.html', form = form)
+
+			try:
+				profile.executeUpdate(
+					'UPDATE WEBSQLQRY SET SCOPE = ?, DES = ? WHERE QID = ?',
+					[ scope, form['description'], form['id'] ],
+					)
+
+				profile.executeUpdate(
+					'UPDATE WEBSQLQRY SET QUERY = ? WHERE QID = ?',
+					[ form['squery'], form['id'] ],
+					)
+			except java.sql.SQLException, sqle:
+				flash(sqle.message, FLASH_ERROR)
+				return render_template('sqleditor.html', form = form)
+
+			flash('%s updated!' % form['id'], FLASH_SUCCESS)
+		else:
+			try:
+				profile.executeUpdate(
+					'INSERT INTO WEBSQLQRY (QID,SCOPE,DES) VALUES (?,?,?)',
+					[ form['id'], scope, form['description'] ],
+					)
+
+				profile.executeUpdate(
+					'UPDATE WEBSQLQRY SET QUERY = ? WHERE QID = ?',
+					[ form['squery'], form['id'] ],
+					)
+			except java.sql.SQLException, sqle:
+				flash(sqle.message, FLASH_ERROR)
+				return render_template('sqleditor.html', form = form)
+
+			flash('%s created!' % form['id'], FLASH_SUCCESS)
+		
+		return render_template('sqleditor.html', form = form)
+	else:
+		form = {}
+
+		if 'edit' in request.args:
+				_, queries = profile.executeQuery(
+					"SELECT QID,DES,SCOPE FROM WEBSQLQRY WHERE QID=?",
+					1,
+					[request.args['edit']]
+					)
+
+				if not queries:
+					flash('Report %s not found' % request.args['edit'], FLASH_ERROR)
+					return redirect(url_for('reports'))
+
+				report = queries[0]
+				form['id'] = report[0]
+				form['description'] = report[1]
+				form['scope'] = True if report[2] == settings.SCOPE_PRIVATE else False
+
+				_, queries = profile.executeQuery(
+					"SELECT QUERY FROM WEBSQLQRY WHERE QID=?",
+					1,
+					[request.args['edit']]
+					)
+
+				if queries and queries[0][0]:
+					session['query'] = queries[0][0]
+				else:
+					session['query'] = ''
+
+		form['squery'] = session['query']
+
+		return render_template('sqleditor.html', form = form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

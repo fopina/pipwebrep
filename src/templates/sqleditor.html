@@ -1,24 +1,67 @@
 {% extends "base.html" %}
 {% block title %}SQL{% endblock %}
 {% block content %}
+	{% if confirm_required %}
+	<div class="alert alert-danger fade in">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+      <h4>Confirmation required</h4>
+      <p>You are about to overwrite {{ form['id'] }}.</p>
+      <p>
+        <button type="button" class="btn btn-danger" id="confirmButton">Do it!</button>
+      </p>
+    </div>
+    {% endif %}
 	<div class="row">
 		<div class="col-md-12">
-			<form method="POST" action="query" accept-charset="UTF-8" role="form" id="loginform" class="form-signin">
+			<form method="POST" action="query" accept-charset="UTF-8" role="form" id="sqlform" class="form-signin">
 				<fieldset>
 			  		<h4>SQL Query</h4>
 
 			  		<hr class="colorgraph">
 
-				    <textarea class="form-control" placeholder="query" name="query" id="query" rows=10>{{ session['query'] }}</textarea>
+				    <textarea class="form-control" placeholder="query" name="query" id="query" rows=10>{{ form['squery'] }}</textarea>
 				    <br/>
 				    <p class="pull-right">Max Rows: <input type="text" name="maxrows" value="{{ session['maxrows'] }}" /></p>
 				    <br/>
 				    <hr class="colorgraph">
 
-				    <input class="btn btn-lg" type="submit" value="Submit">
+				    <button class="btn btn-primary" type="submit">Submit</button>
+				    <button class="btn btn-default pull-right" type="button" data-toggle="modal" data-target="#saveModal">Save</button>
 			  	</fieldset>
 			</form>
 		</div>
+	</div>
+	<!-- Modal -->
+	<div class="modal fade" id="saveModal" tabindex="-1" role="dialog" aria-labelledby="saveModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+	        <h4 class="modal-title" id="saveModalLabel">Save query</h4>
+	      </div>
+	      <form method="POST" action="sqleditor" accept-charset="UTF-8" role="form" id="saveform" class="form-signin">
+	      	<div class="modal-body">
+						<fieldset>
+						    <label for="id">ID</label>
+						    <input class="form-control" placeholder="id" name="id" type="text" value="{{ form['id'] }}">
+						    <label for="description">Description</label>
+						    <input class="form-control" placeholder="description" name="description" type="text" value="{{ form['description'] }}">
+						    <div class="checkbox">
+							    <label>
+							      <input type="checkbox" name="scope"{% if form['scope'] %}checked="checked"{% endif %}>Private
+							    </label>
+							</div>
+							<input name="squery" id="squery" type="hidden">
+							<input name="confirmsave" id="confirmsave" type="hidden">
+					  	</fieldset>
+	      	</div>
+		    <div class="modal-footer">
+		      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		      <button type="submit" class="btn btn-primary">Save</button>
+		    </div>
+	      </form>
+	    </div>
+	  </div>
 	</div>
 {% endblock %}
 
@@ -28,12 +71,22 @@
 	    var keyCode = (event.which ? event.which : event.keyCode);          
 	    
 	    if (keyCode === 10 || keyCode == 13 && event.metaKey) {
-	        $("#loginform").submit();
+	        $("#sqlform").submit();
 	        return false;
 	    }
 
 	    return true;
 	});
+	$("#saveform").submit(function() {
+		$("#squery").val($("#query").val());
+		return true;
+	});
+	{% if confirm_required %}
+	$("#confirmButton").click(function() {
+		$("#confirmsave").val("confirm");
+		$("#saveform").submit();
+	});
+	{% endif %}
 	$("#query").focus();
 	</script>
 {% endblock %}

@@ -18,7 +18,9 @@
 				<td>{{ col }}</td>
 				{% endfor %}
 				<td>
-					<span class="glyphicon glyphicon-pencil"></span>
+					<a href="{{ url_for('sqleditor', edit=row.0) }}">
+						<span class="glyphicon glyphicon-pencil"></span>
+					</a>
 				</td>
 				<td>
 					<span class="glyphicon glyphicon-remove"></span>

@@ -48,6 +48,21 @@ def reports():
 	profile = session['profile']
 	reports = []
 
+	confirm_required = False
+
+	if request.args.get('del'):
+		if 'confirm' not in request.args:
+			confirm_required = True
+		else:
+			try:
+				profile.executeUpdate(
+					'DELETE FROM WEBSQLQRY WHERE QID = ?',
+					[ request.args['del'] ],
+					)
+				flash('%s deleted!' % request.args['del'], FLASH_SUCCESS)
+			except java.sql.SQLException, sqle:
+				flash(sqle.message, FLASH_ERROR)
+
 	try:
 		_, reports = profile.executeQuery(
 			"SELECT QID,DES,SCOPE,USR FROM WEBSQLQRY WHERE SCOPE=? or (SCOPE=? and USR=?)",
@@ -57,7 +72,7 @@ def reports():
 	except java.sql.SQLException, sqle:
 		flash(sqle.message, FLASH_ERROR)
 	
-	return render_template('reports.html', reports = reports)
+	return render_template('reports.html', reports = reports, confirm_required = confirm_required)
 
 
 @app.route('/sqleditor', methods=['GET', 'POST'])

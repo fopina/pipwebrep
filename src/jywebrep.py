@@ -177,7 +177,7 @@ def sqleditor():
 				else:
 					session['query'] = ''
 
-		form['squery'] = session['query']
+		form['squery'] = session.get('query','')
 
 		return render_template('sqleditor.html', form = form)
 

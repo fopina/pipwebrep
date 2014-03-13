@@ -28,12 +28,12 @@
 				<td>{{ col }}</td>
 				{% endfor %}
 				<td>
-					<a href="{{ url_for('sqleditor', edit=row.0) }}">
+					<a href="{{ url_for('sqleditor', edit=row.0) }}" data-toggle="tooltip" class="tooltipLink" data-original-title="Edit">
 						<span class="glyphicon glyphicon-pencil"></span>
 					</a>
 				</td>
 				<td>
-					<a href="{{ url_for('reports', del=row.0) }}">
+					<a href="{{ url_for('reports', del=row.0) }}" data-toggle="tooltip" class="tooltipLink" data-original-title="Delete">
 						<span class="glyphicon glyphicon-remove"></span>
 					</a>
 				</td>
@@ -51,6 +51,7 @@
 	$(".clickableRow").click(function() {
         window.document.location = $(this).data('url') + '&maxrows=' + $("#maxrows").val();
     });
+    $("a.tooltipLink").tooltip();
 	{% if confirm_required %}
 	$("#confirmButton").click(function() {
 		window.document.location = "{{ url_for('reports', del=request.args['del']) }}" + '&confirm';

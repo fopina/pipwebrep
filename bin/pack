@@ -13,6 +13,13 @@ if [ ! -e src/WEB-INF/lib/jython.jar ]; then
 	curl -o src/WEB-INF/lib/jython.jar -O "${JYTHONURL}" || exit 1
 fi
 
+GITVERSION=`git rev-list --count HEAD`
+
+cat <<EOF > src/gitversion.py
+# file generated automatically, do not edit
+VERSION = ${GITVERSION}
+EOF
+
 (cd src && jar cvf "../dist/$WAR" .) > /dev/null
 
 if [ "$?" == "0" ]; then

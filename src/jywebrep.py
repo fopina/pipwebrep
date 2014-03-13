@@ -12,6 +12,12 @@ FLASH_SUCCESS = 'success'
 app = Flask(__name__)
 app.config.from_object('settings')
 
+try:
+	import gitversion
+	app.config['VERSION'] = gitversion.VERSION
+except:
+	app.config['VERSION'] = 'DEV'
+
 # dirty fix for app root_path because module is loaded as "__builtin__" (in Tomcat)
 # as flask is in the app WEB-INF
 # sys.modules['flask'].__file__

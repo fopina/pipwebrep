@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 {% block title %}SQL{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static',filename='css/codemirror.css') }}">
+{% endblock %}
 {% block content %}
 	{% if confirm_required %}
 	<div class="alert alert-danger fade in">
@@ -66,8 +70,18 @@
 {% endblock %}
 
 {% block scripts %}
+	<script src="{{ url_for('static',filename='js/codemirror.js') }}"></script>
+	<script src="{{ url_for('static',filename='js/sql.js') }}"></script>
 	<script>
-	$("#query").keypress(function (event) {
+	var myCodeMirror = CodeMirror.fromTextArea($("#query")[0], {
+		mode: 'text/x-sql',
+		indentWithTabs: true,
+		smartIndent: true,
+		lineNumbers: true,
+		matchBrackets : true,
+		autofocus: true,
+	});
+	$(myCodeMirror.display.input).keypress(function (event) {
 	    var keyCode = (event.which ? event.which : event.keyCode);          
 	    
 	    if (keyCode === 10 || keyCode == 13 && event.metaKey) {
@@ -78,7 +92,12 @@
 	    return true;
 	});
 	$("#saveform").submit(function() {
+		myCodeMirror.save();
 		$("#squery").val($("#query").val());
+		return true;
+	});
+	$("#sqlform").submit(function() {
+		myCodeMirror.save();
 		return true;
 	});
 	{% if confirm_required %}
@@ -87,6 +106,5 @@
 		$("#saveform").submit();
 	});
 	{% endif %}
-	$("#query").focus();
 	</script>
 {% endblock %}

@@ -24,7 +24,7 @@ EOF
 
 if [ "$?" == "0" ]; then
 	echo
-	echo Packing was successful
+	echo "Packing was successful (v${GITVERSION})"
 	ls -la "dist/$WAR"
 else
 	echo

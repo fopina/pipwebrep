@@ -1,22 +1,36 @@
-from flask import Flask, session, redirect, url_for, escape, request, render_template, flash
+from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, Response
 from functools import wraps
 from PIPStuff import PIPUser
 import settings
 
+# jExcelAPI imports
+#from java.io import ByteArrayOutputStream
+# temporary workaround #
+import tempfile
+from java.io import File
+########################
+from jxl import Workbook
+from jxl.write import WritableCellFormat,WritableFont,Label
+
+# JDBC...
 import java.lang.Class
 java.lang.Class.forName(settings.DRIVER)
 
+# Flask FLASH categories
 FLASH_ERROR = 'danger'
 FLASH_SUCCESS = 'success'
 
+# app initializion
 app = Flask(__name__)
 app.config.from_object('settings')
 
+# app version
 try:
 	import gitversion
 	app.config['VERSION'] = gitversion.VERSION
 except:
 	app.config['VERSION'] = 'DEV'
+
 
 # dirty fix for app root_path because module is loaded as "__builtin__" (in Tomcat)
 # as flask is in the app WEB-INF
@@ -209,6 +223,8 @@ def query():
 	profile = session['profile']
 	maxrows = settings.DEFAULT_MAXROWS
 
+	excel = 'excel' in request.args
+
 	if request.method == 'POST':
 		query = request.form.get('query')
 		try:
@@ -241,11 +257,38 @@ def query():
 
 	try:
 		headers, results = profile.executeQuery(query, maxrows)
-		return render_template('query.html', query = query, headers = headers, results = results)
+		if not excel:
+			return render_template('query.html', query = query, headers = headers, results = results)
+		else:
+			filename = request.args.get('run','Report')
+			#bos = ByteArrayOutputStream()
+			bosf = tempfile.NamedTemporaryFile()
+			bosn = bosf.name
+			bos = File(bosn)
+			workbook = Workbook.createWorkbook(bos)
+
+			sheet = workbook.createSheet(filename, 0)
+
+			boldFont = WritableCellFormat(WritableFont(WritableFont.ARIAL, 10, WritableFont.BOLD))
+			for col in xrange(len(headers)):
+				sheet.addCell(Label(col, 0, headers[col], boldFont))
+
+			for row in xrange(len(results)):
+				rrow = results[row]
+				for col in xrange(len(rrow)):
+					sheet.addCell(Label(col, row+1, rrow[col]))
+
+			workbook.write()
+			workbook.close()
+			
+			# to change to memorystream some day, after discovering how to use java ByteArray in Response object
+			resp = Response(open(bosn,'r').read(), mimetype = 'application/octect-stream', headers = { 'Content-Disposition': 'attachment; filename=' + filename + '.xls' })
+			bosf.close() # remove temporary file...
+			return resp
 	except java.sql.SQLException, sqle:
 		flash(sqle.message, FLASH_ERROR)
-	except:
-		flash('Query Failed', FLASH_ERROR)
+	except Exception, exp:
+		print repr(exp)
 		raise
 
 	return redirect(url_for('query'))

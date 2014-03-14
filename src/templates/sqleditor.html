@@ -17,7 +17,7 @@
     {% endif %}
 	<div class="row">
 		<div class="col-md-12">
-			<form method="POST" action="query" accept-charset="UTF-8" role="form" id="sqlform" class="form-signin">
+			<form method="POST" action="{{ url_for('query') }}" accept-charset="UTF-8" role="form" id="sqlform" class="form-signin">
 				<fieldset>
 			  		<h4>SQL Query</h4>
 
@@ -29,8 +29,11 @@
 				    <br/>
 				    <hr class="colorgraph">
 
-				    <button class="btn btn-primary" type="submit">Submit</button>
-				    <button class="btn btn-default pull-right" type="button" data-toggle="modal" data-target="#saveModal">Save</button>
+				    <button class="btn btn-primary" type="button" id="submitButton">Submit</button>
+				    <div class="pull-right">
+					    <button class="btn btn-default" type="button" id="downloadxls">Download as XLS</button>
+					    <button class="btn btn-default" type="button" data-toggle="modal" data-target="#saveModal">Save</button>
+					</div>
 			  	</fieldset>
 			</form>
 		</div>
@@ -90,6 +93,14 @@
 	    }
 
 	    return true;
+	});
+	$("#submitButton").click(function() {
+		$("#sqlform").attr('action', '{{ url_for('query') }}');
+		$("#sqlform").submit();
+	});
+	$("#downloadxls").click(function() {
+		$("#sqlform").attr('action', '{{ url_for('query', excel=1) }}');
+		$("#sqlform").submit();
 	});
 	$("#saveform").submit(function() {
 		myCodeMirror.save();

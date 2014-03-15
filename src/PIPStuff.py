@@ -1,4 +1,5 @@
 from java.sql import DriverManager,Statement,ResultSet,ResultSetMetaData
+from datetime import date
 
 # stupid bug...
 # make sure any module that uses PIPStuff calls Class.forName
@@ -44,7 +45,7 @@ class PIPUser():
 		while rs.next():
 			cols = []
 			for i in xrange(1, rsmd.getColumnCount()+1):
-				cols.append(rs.getString(i))
+				cols.append(self._proper_rs_get_column(rs, i, types[i-1]))
 			rows.append(cols)
 
 		if metadata:
@@ -73,5 +74,10 @@ class PIPUser():
 			else:
 				statement.setString(i+1, values[i])
 
-	def _proper_rs_get_column(rs, column, type):
+	def _proper_rs_get_column(self, rs, column, type):
+		if type == TYPE_DATE:
+			return date.fromtimestamp(rs.getDate(column).getTime()/1000)
+		if type == TYPE_BOOL:
+			return rs.getBoolean(column)
+
 		return rs.getString(column)

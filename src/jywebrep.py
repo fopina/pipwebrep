@@ -10,7 +10,10 @@ import tempfile
 from java.io import File
 ########################
 from jxl import Workbook
-from jxl.write import WritableCellFormat,WritableFont,Label
+from jxl.write import WritableCellFormat,WritableFont,Label,DateTime,Boolean
+from java.util import Date
+from datetime import date
+from time import mktime
 
 # JDBC...
 import java.lang.Class
@@ -276,7 +279,13 @@ def query():
 			for row in xrange(len(results)):
 				rrow = results[row]
 				for col in xrange(len(rrow)):
-					sheet.addCell(Label(col, row+1, rrow[col]))
+					if rrow[col].__class__ == date:
+						cell = DateTime(col, row+1, Date(int(mktime(rrow[col].timetuple())*1000)))
+					elif rrow[col].__class__ == bool:
+						cell = Boolean(col, row+1, rrow[col])
+					else:
+						cell = Label(col, row+1, rrow[col])
+					sheet.addCell(cell)
 
 			workbook.write()
 			workbook.close()

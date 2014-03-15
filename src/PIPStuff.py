@@ -5,6 +5,14 @@ from java.sql import DriverManager,Statement,ResultSet,ResultSetMetaData
 # import java.lang.Class
 # java.lang.Class.forName(DRIVER_NAME)
 
+TYPE_DATE = 'DATE'
+TYPE_BOOL = 'BIT'
+TYPE_INT = 'BIGINT'
+TYPE_DECIMAL = 'DECIMAL'
+TYPE_TIME = 'TIME'
+TYPE_VARCHAR = 'VARCHAR2'
+TYPE_DOUBLE = 'DOUBLE'
+
 class PIPUser():
 	def __init__(self, dburl, dbuser, dbpass):
 		self._dburl = dburl
@@ -14,12 +22,12 @@ class PIPUser():
 	def connect(self):
 		return DriverManager.getConnection(self._dburl,self.username,self.password)
 
-	def executeQuery(self, sqlQry, maxrows = None, values = []):
+	def execute_query(self, sqlQry, maxrows = None, values = [], metadata = False):
 		connection = self.connect()
 
 		statement = connection.prepareStatement(sqlQry, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
 
-		self._updateStatement(statement, values)
+		self._update_statement(statement, values)
 
 		if maxrows:
 			statement.setMaxRows(maxrows)
@@ -27,10 +35,11 @@ class PIPUser():
 		rs = statement.executeQuery()
 		rsmd = rs.getMetaData()
 
-		headers, rows = ([],[])
-
+		headers, types, rows = ([],[], [])
+	
 		for i in xrange(1, rsmd.getColumnCount()+1):
 			headers.append(rsmd.getColumnLabel(i))
+			types.append(rsmd.getColumnTypeName(i))
 
 		while rs.next():
 			cols = []
@@ -38,20 +47,23 @@ class PIPUser():
 				cols.append(rs.getString(i))
 			rows.append(cols)
 
-		return (headers,rows)
+		if metadata:
+			return (headers, types, rows)
+		else:
+			return rows
 
-	def executeUpdate(self, sql, values = []):
+	def execute_update(self, sql, values = []):
 		connection = self.connect()
 
 		statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
 
-		self._updateStatement(statement, values)
+		self._update_statement(statement, values)
 
 		rows = statement.executeUpdate()
 
 		return rows
 
-	def _updateStatement(self, statement, values):
+	def _update_statement(self, statement, values):
 		if not values:
 			return
 
@@ -59,4 +71,7 @@ class PIPUser():
 			if values[i] == None:
 				statement.setString(i+1, '')
 			else:
-				statement.setString(i+1, values[i])		
+				statement.setString(i+1, values[i])
+
+	def _proper_rs_get_column(rs, column, type):
+		return rs.getString(column)

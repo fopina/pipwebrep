@@ -75,7 +75,7 @@ def reports():
 			confirm_required = True
 		else:
 			try:
-				profile.executeUpdate(
+				profile.execute_update(
 					'DELETE FROM WEBSQLQRY WHERE QID = ?',
 					[ request.args['del'] ],
 					)
@@ -84,7 +84,7 @@ def reports():
 				flash(sqle.message, FLASH_ERROR)
 
 	try:
-		_, reports = profile.executeQuery(
+		reports = profile.execute_query(
 			"SELECT QID,DES,SCOPE,USR FROM WEBSQLQRY WHERE SCOPE=? or (SCOPE=? and USR=?)",
 			 100,
 			 [settings.SCOPE_PUBLIC, settings.SCOPE_PRIVATE, profile.username]
@@ -108,7 +108,7 @@ def sqleditor():
 			flash('Report ID is required!', FLASH_ERROR)
 			return render_template('sqleditor.html', form = form)
 
-		_, queries = profile.executeQuery(
+		queries = profile.execute_query(
 					"SELECT QID,SCOPE,USR FROM WEBSQLQRY WHERE QID=?",
 					1,
 					[form['id']]
@@ -129,12 +129,12 @@ def sqleditor():
 				return render_template('sqleditor.html', form = form)
 
 			try:
-				profile.executeUpdate(
+				profile.execute_update(
 					'UPDATE WEBSQLQRY SET SCOPE = ?, DES = ? WHERE QID = ?',
 					[ scope, form['description'], form['id'] ],
 					)
 
-				profile.executeUpdate(
+				profile.execute_update(
 					'UPDATE WEBSQLQRY SET QUERY = ? WHERE QID = ?',
 					[ form['squery'], form['id'] ],
 					)
@@ -145,12 +145,12 @@ def sqleditor():
 			flash('%s updated!' % form['id'], FLASH_SUCCESS)
 		else:
 			try:
-				profile.executeUpdate(
+				profile.execute_update(
 					'INSERT INTO WEBSQLQRY (QID,SCOPE,DES) VALUES (?,?,?)',
 					[ form['id'], scope, form['description'] ],
 					)
 
-				profile.executeUpdate(
+				profile.execute_update(
 					'UPDATE WEBSQLQRY SET QUERY = ? WHERE QID = ?',
 					[ form['squery'], form['id'] ],
 					)
@@ -165,7 +165,7 @@ def sqleditor():
 		form = {}
 
 		if 'edit' in request.args:
-				_, queries = profile.executeQuery(
+				queries = profile.execute_query(
 					"SELECT QID,DES,SCOPE FROM WEBSQLQRY WHERE QID=?",
 					1,
 					[request.args['edit']]
@@ -180,7 +180,7 @@ def sqleditor():
 				form['description'] = report[1]
 				form['scope'] = True if report[2] == settings.SCOPE_PRIVATE else False
 
-				_, queries = profile.executeQuery(
+				queries = profile.execute_query(
 					"SELECT QUERY FROM WEBSQLQRY WHERE QID=?",
 					1,
 					[request.args['edit']]
@@ -233,7 +233,7 @@ def query():
 			pass
 	else:
 		if 'run' in request.args:
-			_, queries = profile.executeQuery(
+			queries = profile.execute_query(
 				"SELECT QUERY FROM WEBSQLQRY WHERE QID=?",
 				1,
 				[request.args['run']]
@@ -256,7 +256,7 @@ def query():
 	session['maxrows'] = maxrows
 
 	try:
-		headers, results = profile.executeQuery(query, maxrows)
+		headers, _, results = profile.execute_query(query, maxrows, metadata = True)
 		if not excel:
 			return render_template('query.html', query = query, headers = headers, results = results)
 		else:

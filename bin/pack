@@ -20,7 +20,9 @@ cat <<EOF > src/gitversion.py
 VERSION = ${GITVERSION}
 EOF
 
-(cd src && jar cvf "../dist/$WAR" .) > /dev/null
+cd src
+jar cf "../dist/$WAR" `find . -not -name \*.pyc -not -name \*\$py.class -not -type d` > /dev/null
+cd ..
 
 if [ "$?" == "0" ]; then
 	echo

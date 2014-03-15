@@ -3,17 +3,9 @@ from functools import wraps
 from PIPStuff import PIPUser
 import settings
 
-# jExcelAPI imports
-#from java.io import ByteArrayOutputStream
-# temporary workaround #
-import tempfile
-from java.io import File
-########################
-from jxl import Workbook
-from jxl.write import WritableCellFormat,WritableFont,Label,DateTime,Boolean
-from java.util import Date
-from datetime import date
-from time import mktime
+# XLS export
+import xlwt_helper
+from StringIO import StringIO
 
 # JDBC...
 import java.lang.Class
@@ -264,36 +256,16 @@ def query():
 			return render_template('query.html', query = query, headers = headers, results = results)
 		else:
 			filename = request.args.get('run','Report')
-			#bos = ByteArrayOutputStream()
-			bosf = tempfile.NamedTemporaryFile()
-			bosn = bosf.name
-			bos = File(bosn)
-			workbook = Workbook.createWorkbook(bos)
-
-			sheet = workbook.createSheet(filename, 0)
-
-			boldFont = WritableCellFormat(WritableFont(WritableFont.ARIAL, 10, WritableFont.BOLD))
-			for col in xrange(len(headers)):
-				sheet.addCell(Label(col, 0, headers[col], boldFont))
-
-			for row in xrange(len(results)):
-				rrow = results[row]
-				for col in xrange(len(rrow)):
-					if rrow[col].__class__ == date:
-						cell = DateTime(col, row+1, Date(int(mktime(rrow[col].timetuple())*1000)))
-					elif rrow[col].__class__ == bool:
-						cell = Boolean(col, row+1, rrow[col])
-					else:
-						cell = Label(col, row+1, rrow[col])
-					sheet.addCell(cell)
-
-			workbook.write()
-			workbook.close()
 			
-			# to change to memorystream some day, after discovering how to use java ByteArray in Response object
-			resp = Response(open(bosn,'r').read(), mimetype = 'application/octect-stream', headers = { 'Content-Disposition': 'attachment; filename=' + filename + '.xls' })
-			bosf.close() # remove temporary file...
-			return resp
+			res = StringIO()
+
+			xlwt_helper.output(
+				res, filename, headers, results,
+				footer_text = 'jyWepRep ' + str(app.config['VERSION']),
+				footer_link = 'https://github.com/fopina/pipwebrep/'
+				)
+
+			return Response(res.getvalue(), mimetype = 'application/octect-stream', headers = { 'Content-Disposition': 'attachment; filename=' + filename + '.xls' })
 	except java.sql.SQLException, sqle:
 		flash(sqle.message, FLASH_ERROR)
 	except Exception, exp:

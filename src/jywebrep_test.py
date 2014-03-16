@@ -3,8 +3,7 @@ import jywebrep
 import flask
 import unittest
 
-TESTID = '1'
-TESTPWD = 'xxx'
+from settings import TESTUID, TESTPWD
 
 class jyWebRepTestCase(unittest.TestCase):
 
@@ -21,10 +20,10 @@ class jyWebRepTestCase(unittest.TestCase):
 
 	def test_login_failed(self):
 		rv = self.login('script', 'kiddie')
-		assert 'Server Error - invalid user ID' in rv.data
+		assert 'ER_SV_INVLDUID' in rv.data
 
 	def test_login_logout(self):
-		rv = self.login(TESTID, TESTPWD)
+		rv = self.login(TESTUID, TESTPWD)
 		assert '<title>Reports</title>' in rv.data
 		rv = self.logout()
 		assert '<form method="POST" action="login"' in rv.data
@@ -32,7 +31,7 @@ class jyWebRepTestCase(unittest.TestCase):
 	def test_pipstuff_sql(self):
 		with self.app as c:
 			rv = c.post('/login', data = dict(
-				username = TESTID,
+				username = TESTUID,
 				password = TESTPWD
 			), follow_redirects=True)
 			profile = flask.session.get('profile')
@@ -44,7 +43,20 @@ class jyWebRepTestCase(unittest.TestCase):
 			assert profile.execute_query('SELECT CONAM from CUVAR')[0][0] == newv
 			profile.execute_update("UPDATE CUVAR SET CONAM=?", [ oldv ])
 			assert profile.execute_query('SELECT CONAM from CUVAR')[0][0] == oldv
-		
+
+	def test_xls_export(self):
+		# random selection of PIP fields based on types
+		#               D,  T,    N     ,$  ,L    ,N.5N
+		query = 'select TJD,CONAM,CORPID,%CC,CCMOD,%BWPCT from CUVAR'
+		rv = self.login(TESTUID, TESTPWD)
+		rv = self.app.post('/query?excel', data=dict(
+			query=query,
+		), follow_redirects=True)
+		# XLS header
+		assert rv.data[:8] == '\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1'
+		f = open('../dist/test_export.xls','w')
+		f.write(rv.data)
+		f.close()
 
 	def login(self, username, password):
 		return self.app.post('/login', data=dict(

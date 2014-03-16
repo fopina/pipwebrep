@@ -38,7 +38,6 @@ def output(file_or_stream, sheetname, headers, values, encoding = 'utf8', footer
 	if footer_link and footer_text:
 		link_font = Font()
 		link_font.name = 'Verdana'
-		link_font.underline = Font.UNDERLINE_DOUBLE
 		link_font.colour_index = 4
 		link_font.height = 20*8
 

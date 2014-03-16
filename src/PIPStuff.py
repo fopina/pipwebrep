@@ -85,4 +85,10 @@ class PIPUser():
 			return rs.getDouble(column)
 		if type == TYPE_DOUBLE:
 			return rs.getDouble(column)
-		return rs.getString(column)
+
+		val = rs.getString(column)
+
+		if val == None:
+			val = ''
+
+		return val

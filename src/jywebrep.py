@@ -261,7 +261,7 @@ def query():
 
 			xlwt_helper.output(
 				res, filename, headers, results,
-				footer_text = 'jyWepRep ' + str(app.config['VERSION']),
+				footer_text = 'jyWepRep v' + str(app.config['VERSION']),
 				footer_link = 'https://github.com/fopina/pipwebrep/'
 				)
 

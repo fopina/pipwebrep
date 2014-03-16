@@ -14,11 +14,19 @@ def output(file_or_stream, sheetname, headers, values, encoding = 'utf8', footer
 	header_font = Font()
 	header_font.bold = True
 
+	al = Alignment()
+	
+	al.horz = Alignment.HORZ_CENTER
 	header_style = XFStyle()
 	header_style.font = header_font
+	header_style.alignment = al
 
 	for i,header in enumerate(headers):
 		sh.write(0, i, header, header_style)
+
+	sh.set_panes_frozen(True) # frozen headings instead of split panes
+	sh.set_horz_split_pos(1) # in general, freeze after last heading row
+	sh.set_remove_splits(True) # if user does unfreeze, don't leave a split there
 
 	for j, row in enumerate(values):
 		for i, value in enumerate(row):

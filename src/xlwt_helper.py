@@ -1,5 +1,6 @@
 import xlwt
 from xlwt import XFStyle,Formula,Font,Alignment
+from datetime import date
 
 def output(file_or_stream, sheetname, headers, values, encoding = 'utf8', footer_text = None, footer_link = None):
 	import xlwt
@@ -21,7 +22,10 @@ def output(file_or_stream, sheetname, headers, values, encoding = 'utf8', footer
 
 	for j, row in enumerate(values):
 		for i, value in enumerate(row):
-			sh.write(j+1, i, value, datestyle)
+			if value.__class__ == date:
+				sh.write(j+1, i, value, datestyle)
+			else:
+				sh.write(j+1, i, value)
 
 	if footer_link and footer_text:
 		link_font = Font()

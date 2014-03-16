@@ -79,5 +79,10 @@ class PIPUser():
 			return date.fromtimestamp(rs.getDate(column).getTime()/1000)
 		if type == TYPE_BOOL:
 			return rs.getBoolean(column)
-
+		if type == TYPE_INT:
+			return rs.getInt(column)
+		if type == TYPE_DECIMAL:
+			return rs.getDouble(column)
+		if type == TYPE_DOUBLE:
+			return rs.getDouble(column)
 		return rs.getString(column)

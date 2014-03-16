@@ -48,8 +48,7 @@ class jyWebRepTestCase(unittest.TestCase):
 	def test_xls_export(self):
 		# random selection of PIP fields based on types
 		#               D,  T,    N     ,$  ,L    ,N.5N
-		#query = 'select TJD,CONAM,CORPID,%CC,CCMOD,%BWPCT from CUVAR'
-		query = 'select TIME from HIST'
+		query = 'select TJD,CONAM,CORPID,%CC,CCMOD,%BWPCT from CUVAR'
 		rv = self.login(TESTUID, TESTPWD)
 		rv = self.app.post('/query?excel', data=dict(
 			query=query,

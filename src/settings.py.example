@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # JDBC driver class - in case it changes in the future
 DRIVER = 'sanchez.jdbc.driver.ScDriver'
 

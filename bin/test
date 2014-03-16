@@ -5,4 +5,8 @@ cd `dirname $0`/../src
 export JYTHONPATH="WEB-INF/lib-python"
 export CLASSPATH="WEB-INF/lib/*"
 
-jython jywebrep_test.py $*
+if [ -z "$1" ]; then
+	jython jywebrep_test.py
+else
+	jython jywebrep_test.py jyWebRepTestCase.$*
+fi

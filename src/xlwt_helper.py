@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 import xlwt
 from xlwt import XFStyle,Formula,Font,Alignment
-from datetime import date
+from datetime import date,time
 
 def output(file_or_stream, sheetname, headers, values, encoding = 'utf8', footer_text = None, footer_link = None):
 	import xlwt
@@ -10,6 +11,9 @@ def output(file_or_stream, sheetname, headers, values, encoding = 'utf8', footer
 
 	datestyle = XFStyle()
 	datestyle.num_format_str = 'DD/MM/YYYY'
+
+	timestyle = XFStyle()
+	timestyle.num_format_str = 'HH:MM:SS'
 
 	header_font = Font()
 	header_font.bold = True
@@ -32,6 +36,8 @@ def output(file_or_stream, sheetname, headers, values, encoding = 'utf8', footer
 		for i, value in enumerate(row):
 			if value.__class__ == date:
 				sh.write(j+1, i, value, datestyle)
+			elif value.__class__ == time:
+				sh.write(j+1, i, value, timestyle)
 			else:
 				sh.write(j+1, i, value)
 

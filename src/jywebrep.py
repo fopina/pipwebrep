@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, session, redirect, url_for, escape, request, render_template, flash, Response
 from functools import wraps
 from PIPStuff import PIPUser

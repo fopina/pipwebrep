@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 from java.sql import DriverManager,Statement,ResultSet,ResultSetMetaData
-from datetime import date
+from datetime import date,time
 
 # stupid bug...
 # make sure any module that uses PIPStuff calls Class.forName
@@ -13,6 +14,7 @@ TYPE_DECIMAL = 'DECIMAL'
 TYPE_TIME = 'TIME'
 TYPE_VARCHAR = 'VARCHAR2'
 TYPE_DOUBLE = 'DOUBLE'
+TYPE_TIME = 'TIME'
 
 class PIPUser():
 	def __init__(self, dburl, dbuser, dbpass):
@@ -85,6 +87,9 @@ class PIPUser():
 			return rs.getDouble(column)
 		if type == TYPE_DOUBLE:
 			return rs.getDouble(column)
+		if type == TYPE_TIME:
+			javatime = rs.getTime(column)
+			return time(javatime.hours, javatime.minutes, javatime.seconds)
 
 		val = rs.getString(column)
 

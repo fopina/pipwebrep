@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import with_statement
 import jywebrep
 import flask
@@ -47,7 +48,8 @@ class jyWebRepTestCase(unittest.TestCase):
 	def test_xls_export(self):
 		# random selection of PIP fields based on types
 		#               D,  T,    N     ,$  ,L    ,N.5N
-		query = 'select TJD,CONAM,CORPID,%CC,CCMOD,%BWPCT from CUVAR'
+		#query = 'select TJD,CONAM,CORPID,%CC,CCMOD,%BWPCT from CUVAR'
+		query = 'select TIME from HIST'
 		rv = self.login(TESTUID, TESTPWD)
 		rv = self.app.post('/query?excel', data=dict(
 			query=query,

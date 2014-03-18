@@ -2,12 +2,13 @@
 # JDBC driver class - in case it changes in the future
 DRIVER = 'sanchez.jdbc.driver.ScDriver'
 
+CON_NAME = 'TEST'
 # MTM IP and port configuration
 HOST = '192.168.207.160'
 PORT = '18166'
 
 # JDBC URL
-URL = 'protocol=jdbc:sanchez/database=' + HOST + ':' + PORT + ':SCA$IBS'
+URL = 'protocol=jdbc:sanchez/database=%s:%s:SCA$IBS'
 
 # SCOPE values for WEBSQLQRY
 SCOPE_PRIVATE = 'Private'

@@ -194,7 +194,10 @@ def sqleditor():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
-		profile = PIPUser(settings.URL, request.form['username'], request.form['password'])
+		environ = request.form['environ'].split(':')
+		host = environ[0]
+		port = environ[1]
+		profile = PIPUser(settings.URL % (host, port), request.form['username'], request.form['password'])
 		try:
 			profile.connect()
 			session['profile'] = profile

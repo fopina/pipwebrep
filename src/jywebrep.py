@@ -195,8 +195,21 @@ def sqleditor():
 def login():
 	if request.method == 'POST':
 		environ = request.form['environ'].split(':')
-		host = environ[0]
-		port = environ[1]
+		host = None
+		port = None
+
+		if settings.MANUAL_CONNECTION:
+			host = environ[1]
+			port = environ[2]
+		else:
+			temp = settings.CONNECTIONS.get(environ[0],None)
+			if not temp:
+				flash('Invalid host', FLASH_ERROR)
+				return redirect(url_for('index'))
+			environ = temp.split(':')
+			host = environ[0]
+			port = environ[1]
+
 		profile = PIPUser(settings.URL % (host, port), request.form['username'], request.form['password'])
 		try:
 			profile.connect()

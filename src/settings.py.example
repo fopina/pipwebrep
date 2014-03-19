@@ -2,10 +2,15 @@
 # JDBC driver class - in case it changes in the future
 DRIVER = 'sanchez.jdbc.driver.ScDriver'
 
-CON_NAME = 'TEST'
-# MTM IP and port configuration
-HOST = '192.168.207.160'
-PORT = '18166'
+# static connections
+# NAME: MTM_IP:MTM_PORT
+
+CONNECTIONS = {
+	'PIP': '192.168.207.160:61135',
+}
+
+# allow connection management - security risk!
+MANUAL_CONNECTION = True
 
 # JDBC URL
 URL = 'protocol=jdbc:sanchez/database=%s:%s:SCA$IBS'
@@ -19,7 +24,7 @@ DEFAULT_MAXROWS = 100
 # Flask app.secret_key
 SECRET_KEY = '????????????????????'
 
-# Used only in jywebrep_test.py
+# Used only by jywebrep_test.py
 
 TESTUID = '1'
 TESTPWD = 'XXX'

@@ -28,16 +28,21 @@
 			      <div class="modal-header">
 			        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 			        <h4 class="modal-title" id="hostModalLabel">Manage connections</h4>
+			        <a href="#" class="addmorelink">
+						<span class="glyphicon glyphicon-plus"></span>
+					</a>
 			      </div>
 			      	<div class="modal-body">
 								<fieldset>
+									<table class="table" id="host_input_list">
+									</table>
 									<input name="squery" id="squery" type="hidden">
 									<input name="confirmsave" id="confirmsave" type="hidden">
 							  	</fieldset>
 			      	</div>
 				    <div class="modal-footer">
 				      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				      <button type="submit" class="btn btn-primary">Save</button>
+				      <button type="submit" class="btn btn-primary" id="saveConnections">Save</button>
 				    </div>
 			      </form>
 			    </div>
@@ -46,31 +51,90 @@
 {% endblock %}
 {% block scripts %}
 <script>
-	var listElem = localStorage.getItem('piprep_connections');
-	if (listElem == null) {
-		listElem = { '{{ config.CON_NAME }}' : '{{ config.HOST }}:{{ config.PORT }}'};
+	var listElem = $.parseJSON(localStorage.getItem('piprep_connections'));
+
+	function updateEnviron() {
+		if (listElem == null) {
+			listElem = {
+				{% for con in config['CONNECTIONS'] %}
+				'{{ con }}' : '{{ con }}:{{ config['CONNECTIONS'][con] }}',
+				{% endfor %}
+			};
+		}
+
+		var environ = $("#environ");
+
+		environ.empty();
+
+		$.each(listElem, function(key, value) {
+	    	environ.append($("<option />").val(value).text(key));
+		});
+
+		{% if config['MANUAL_CONNECTION'] %}
+		environ.append($("<option disabled/>").text('-----------'));
+		environ.append($("<option />").val('--mgmt--').text('Manage connections'));
+		{% endif %}
 	}
 
-	var environ = $("#environ");
+	updateEnviron();
 
-	environ.empty();
-
-	$.each(listElem, function(key, value) {
-    	environ.append($("<option />").val(value).text(key));
-	});
-
-	environ.append($("<option disabled/>").text('-----------'));
-	environ.append($("<option />").val('xxx').text('Manage connections'));
+	if (localStorage.getItem('piprep_connection')) {
+		$("#environ").val(localStorage.getItem('piprep_connection'));
+	}
 
 	var previousEnviron;
-	$("#environ").one('focus', function () {
-        previousEnviron = this.value;
+	$("#environ").change(function () {
+		if (this.value != '--mgmt--') {
+        	previousEnviron = this.value;
+        	localStorage.setItem('piprep_connection',previousEnviron);
+        }
     }).change(function() {
 		var val = this.value;
-		if (val == 'xxx') {
+		if (val == '--mgmt--') {
+			var hostInput = $('#host_input_list');
+			hostInput.empty();
+
+			var host, port;
+
+			$.each(listElem, function(key, value) {
+				host = value.split(':')[1];
+				port = value.split(':')[2];
+				hostInput.append('\
+					<tr>\
+						<td><input name="listElem' + key +'" placeholder="name" value="' + key + '"></td>\
+						<td><input name="listElem' + key +'" placeholder="host" value="' + host + '"></td>\
+						<td><input name="listElem' + key +'" placeholder="port" value="' + port + '"></td>\
+					</tr>\
+					');
+			});
+
 			$('#hostModal').modal('show');
 			this.value = previousEnviron;
 		};
+	});
+
+	$(".addmorelink").click(function() {
+		var hostInput = $('#host_input_list');
+
+		hostInput.append('\
+			<tr>\
+				<td><input name="listElemName" placeholder="name" value=""></td>\
+				<td><input name="listElemHost" placeholder="host" value=""></td>\
+				<td><input name="listElemPort" placeholder="port" value=""></td>\
+			</tr>\
+		');
+	});
+
+	$("#saveConnections").click(function() {
+		var inputs = $('#host_input_list>tr>td>input');
+		listElem = {};
+		for (var i=0; i < inputs.length; i += 3) {
+			if (!inputs[i].value) continue;
+			listElem[inputs[i].value] = inputs[i].value + ':' + inputs[i+1].value + ':' + inputs[i+2].value;
+		};
+		localStorage.setItem('piprep_connections',JSON.stringify(listElem));
+		$('#hostModal').modal('hide');
+		updateEnviron();
 	});
 </script>
 {% endblock %}

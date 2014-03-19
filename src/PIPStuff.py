@@ -78,7 +78,10 @@ class PIPUser():
 
 	def _proper_rs_get_column(self, rs, column, type):
 		if type == TYPE_DATE:
-			return date.fromtimestamp(rs.getDate(column).getTime()/1000)
+			javadate = rs.getDate(column)
+			if not javadate:
+				return None
+			return date.fromtimestamp(javadate.getTime()/1000)
 		if type == TYPE_BOOL:
 			return rs.getBoolean(column)
 		if type == TYPE_INT:
@@ -89,11 +92,8 @@ class PIPUser():
 			return rs.getDouble(column)
 		if type == TYPE_TIME:
 			javatime = rs.getTime(column)
+			if not javatime:
+				return None
 			return time(javatime.hours, javatime.minutes, javatime.seconds)
 
-		val = rs.getString(column)
-
-		if val == None:
-			val = ''
-
-		return val
+		return rs.getString(column)
